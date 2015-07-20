@@ -1,0 +1,79 @@
+----------------------------------------------------------------------------
+INTRODUCTION
+----------------------------------------------------------------------------
+
+This code implements the simulation results reported in:
+
+   M. W. Spratling (2014) Classification using sparse representations: a
+   biologically plausible approach, Biological Cybernetics, 108(1):61-73.
+
+Please cite this paper if this code is used in, or to motivate, any publications. 
+
+----------------------------------------------------------------------------
+USAGE
+----------------------------------------------------------------------------
+
+This code was tested with MATLAB Version 7.10 (R2010a).
+
+To use this software:
+    run matlab 
+    cd to the directory containing this code 
+
+Some functions make use of the nansuite toolbox by Jan Glaescher, available at
+http://www.mathworks.com/matlabcentral/fileexchange/6837. These functions should
+thus be installed somewhere on your matlab path.
+
+
+To perform an experiment to test the classification performance of a sparse
+solver run the following command:
+
+  >> test_sparse_classifier;
+
+The output of the test_sparse_classifier code is a list of 6 numbers. These
+numbers provide the follow information:
+
+1. The percentage of exemplars misclassified when classification is performed by
+   assigning the signal to the class of the dictionary element with the MAXimum
+   coefficient,
+
+2. The percentage of exemplars misclassified when classification is performed by
+   assigning the signal to the class of the dictionary elements with the highest
+   SUM of coefficients,
+
+3. The percentage of exemplars misclassified when classification is performed by
+   assigning the signal to the class of the dictionary elements which generate the
+   smallest reconstruction error
+
+4. The total execution time (in seconds)
+
+5. The Hoyer sparsity of the coefficients, averaged over all the signals that
+   were classified
+
+6. The NSE between the signal and the reconstruction of the signal produced by
+   the sparse representation, averaged over all the signals that were classified
+
+
+The set-up of the experiment is controlled by the parameters in the function
+global_parameters.m, as follows:
+
+To change the sparse solver being tested, change the value of the parameter
+"GP.alg". Code for the pcbc-dim solver is included, but to test other solvers
+you should install the small-box toolbox and ensure that the solvers you wish to
+test are on your matlab path.
+
+To perform classification using a single dictionary (as used by Wright et al
+2009b), set the parameter "GP.network" equal to 'single'. To perform
+classification using multiple sub-dictionaries (as used by Sprechmann and
+Sapiro, 2010), set the parameter "GP.network" equal to 'subnets'.
+
+To predefine the dictionary using the training exemplars, set parameter
+"GP.dictionary" equal to 'all'. To learn class-specific sub-dictionaries, using
+the ILS-DLA algorithm, set parameter "GP.dictionary" equal to 'learn'.
+
+To change the way the dictionary elements and signals are normalised, change the
+value of the parameter "GP.dict_norm" (valid values are 1, 2, and Inf).
+
+To change the classification task, modify parameters "GP.data_set" and
+"GP.imDims".
+
+
