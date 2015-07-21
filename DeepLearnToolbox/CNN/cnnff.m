@@ -8,10 +8,14 @@ function net = cnnff(net, x)
             %  !!below can probably be handled by insane matrix operations
             for j = 1 : net.layers{l}.outputmaps   %  for each output map
                 %  create temp output map
-                z = zeros(size(net.layers{l - 1}.a{1}) - [net.layers{l}.kernelsize - 1 net.layers{l}.kernelsize - 1 0]);
+                z = zeros(...
+                    size(net.layers{l - 1}.a{1}) - ...
+                    [net.layers{l}.kernelsize - 1 net.layers{l}.kernelsize - 1 0]);
                 for i = 1 : inputmaps   %  for each input map
                     %  convolve with corresponding kernel and add to temp output map                    
-                    z = z + convn(net.layers{l - 1}.a{i}, net.layers{l}.k{i}{j}, 'valid');
+                    z = z + convn(...
+                        net.layers{l - 1}.a{i}, ...
+                        net.layers{l}.k{i}{j}, 'valid');
                 end
                 %  add bias, pass through nonlinearity
                 net.layers{l}.a{j} = sigm(z + net.layers{l}.b{j});
@@ -22,8 +26,13 @@ function net = cnnff(net, x)
             %  downsample
             for j = 1 : inputmaps
                 
-                z = convn(net.layers{l - 1}.a{j}, ones(net.layers{l}.scale) / (net.layers{l}.scale ^ 2), 'valid');   %  !! replace with variable
-                net.layers{l}.a{j} = z(1 : net.layers{l}.scale : end, 1 : net.layers{l}.scale : end, :);
+                z = convn(...
+                    net.layers{l - 1}.a{j}, ...
+                    ones(net.layers{l}.scale) / (net.layers{l}.scale ^ 2), ...
+                    'valid');   %  !! replace with variable
+                net.layers{l}.a{j} = z(...
+                        1 : net.layers{l}.scale : end, ...
+                        1 : net.layers{l}.scale : end, :);
             end
         end
     end
