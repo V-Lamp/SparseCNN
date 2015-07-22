@@ -45,5 +45,5 @@ function net = cnnff(net, x)
     end
     %  feedforward into output perceptrons
     net.o = sigm(net.ffW * net.fv + repmat(net.ffb, 1, size(net.fv, 2)));
-
+    
 end
