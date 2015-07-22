@@ -1,4 +1,4 @@
-function test_cnn_gradients_are_numerically_correct
+function test_cnn_gradients
 batch_x = rand(28,28,5);
 batch_y = rand(10,5);
 cnn.layers = {

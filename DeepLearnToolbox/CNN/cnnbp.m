@@ -10,7 +10,7 @@ function net = cnnbp(net, y)
     net.od = net.e .* (net.o .* (1 - net.o));   %  output delta
     net.fvd = (net.ffW' * net.od);              %  feature vector delta
     if strcmp(net.layers{n}.type, 'c')         %  only conv layers has sigm function
-        net.fvd = net.fvd .* (net.fv .* (1 - net.fv));
+        net.fvd = net.fvd .* sigm_der(net.fv);;
     end
 
     %  reshape feature vector deltas into output map style
@@ -25,14 +25,17 @@ function net = cnnbp(net, y)
     for l = (n - 1) : -1 : 1
         if strcmp(net.layers{l}.type, 'c')
             for j = 1 : numel(net.layers{l}.a)
-                net.layers{l}.d{j} = ...
-                    net.layers{l}.a{j} .* (1 - net.layers{l}.a{j}) .* ...
-                    (expand(...
+                expanded = expand(...
                      net.layers{l + 1}.d{j}, ...
-                     [net.layers{l + 1}.scale, net.layers{l + 1}.scale 1]) ...
-                     / net.layers{l + 1}.scale ^ 2);
+                     [net.layers{l + 1}.scale, net.layers{l + 1}.scale 1]);
+                expanded = expanded / net.layers{l + 1}.scale ^ 2;
+                sigm_x = net.layers{l}.a{j};
+                not_a_der = sigm_x .* (1 - sigm_x);
+                net.layers{l}.d{j} = not_a_der .* expanded;
+                
             end
         elseif strcmp(net.layers{l}.type, 's')
+            
             for i = 1 : numel(net.layers{l}.a)
                 z = zeros(size(net.layers{l}.a{1}));
                 for j = 1 : numel(net.layers{l + 1}.a)
@@ -48,14 +51,17 @@ function net = cnnbp(net, y)
     %%  calc gradients
     for l = 2 : n
         if strcmp(net.layers{l}.type, 'c')
-            for j = 1 : numel(net.layers{l}.a)
-                for i = 1 : numel(net.layers{l - 1}.a)
+            for i = 1 : numel(net.layers{l - 1}.a)
+                rotA = flipall(net.layers{l - 1}.a{i});
+                for j = 1 : numel(net.layers{l}.a)
                     net.layers{l}.dk{i,j} = ...
                         convn(...
-                            flipall(net.layers{l - 1}.a{i}), ...
+                            rotA, ...
                             net.layers{l}.d{j}, 'valid') ...
                         / size(net.layers{l}.d{j}, 3);
-                end
+                end                
+            end
+            for j = 1 : numel(net.layers{l}.a)                
                 net.layers{l}.db{j} = ...
                     sum(net.layers{l}.d{j}(:)) / size(net.layers{l}.d{j}, 3);
             end
