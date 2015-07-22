@@ -50,7 +50,7 @@ function net = cnnbp(net, y)
     for l = 2 : n
         if strcmp(net.layers{l}.type, 'c')
             for i = 1 : numel(net.layers{l - 1}.a)
-                rotA = rot180(net.layers{l - 1}.a{i});
+                rotA = flipall(net.layers{l - 1}.a{i});
                 for j = 1 : numel(net.layers{l}.a)
                     net.layers{l}.dk{i,j} = ...
                         convn(...
