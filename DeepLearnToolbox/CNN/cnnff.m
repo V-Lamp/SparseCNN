@@ -15,7 +15,7 @@ function net = cnnff(net, x)
                     %  convolve with corresponding kernel and add to temp output map                    
                     z = z + convn(...
                         net.layers{l - 1}.a{i}, ...
-                        net.layers{l}.k{i}{j}, 'valid');
+                        net.layers{l}.k{i,j}, 'valid');
                 end
                 %  add bias, pass through nonlinearity
                 net.layers{l}.a{j} = sigm(z + net.layers{l}.b{j});
