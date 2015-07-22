@@ -33,6 +33,7 @@ function net = cnnbp(net, y)
                      / net.layers{l + 1}.scale ^ 2);
             end
         elseif strcmp(net.layers{l}.type, 's')
+            
             for i = 1 : numel(net.layers{l}.a)
                 z = zeros(size(net.layers{l}.a{1}));
                 for j = 1 : numel(net.layers{l + 1}.a)
@@ -48,14 +49,17 @@ function net = cnnbp(net, y)
     %%  calc gradients
     for l = 2 : n
         if strcmp(net.layers{l}.type, 'c')
-            for j = 1 : numel(net.layers{l}.a)
-                for i = 1 : numel(net.layers{l - 1}.a)
+            for i = 1 : numel(net.layers{l - 1}.a)
+                rotA = rot180(net.layers{l - 1}.a{i});
+                for j = 1 : numel(net.layers{l}.a)
                     net.layers{l}.dk{i,j} = ...
                         convn(...
-                            rot180(net.layers{l - 1}.a{i}), ...,
+                            rotA, ...,
                             net.layers{l}.d{j}, 'valid') ...
                         / size(net.layers{l}.d{j}, 3);
-                end
+                end                
+            end
+            for j = 1 : numel(net.layers{l}.a)                
                 net.layers{l}.db{j} = ...
                     sum(net.layers{l}.d{j}(:)) / size(net.layers{l}.d{j}, 3);
             end
