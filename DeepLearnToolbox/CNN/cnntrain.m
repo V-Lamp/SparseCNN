@@ -2,7 +2,8 @@ function net = cnntrain(net, x, y, opts)
     m = size(x, 3);
     numbatches = m / opts.batchsize;
     if rem(numbatches, 1) ~= 0
-        error('numbatches not integer');
+        disp(numbatches)
+        error('numbatches not integer');        
     end
     net.rL = [];
     for i = 1 : opts.numepochs
