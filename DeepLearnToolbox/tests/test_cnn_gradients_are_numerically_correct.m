@@ -13,3 +13,4 @@ cnn = cnnsetup(cnn, batch_x, batch_y);
 cnn = cnnff(cnn, batch_x);
 cnn = cnnbp(cnn, batch_y);
 cnnnumgradcheck(cnn, batch_x, batch_y);
+disp('Gradients are correct!')

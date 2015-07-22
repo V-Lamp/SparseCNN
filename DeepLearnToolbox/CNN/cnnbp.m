@@ -52,7 +52,7 @@ function net = cnnbp(net, y)
                 for i = 1 : numel(net.layers{l - 1}.a)
                     net.layers{l}.dk{i}{j} = ...
                         convn(...
-                            rot180(net.layers{l - 1}.a{i}), ...
+                            flipall(net.layers{l - 1}.a{i}), ...
                             net.layers{l}.d{j}, 'valid') ...
                         / size(net.layers{l}.d{j}, 3);
                 end
@@ -65,7 +65,7 @@ function net = cnnbp(net, y)
     net.dffb = mean(net.od, 2);
 
     function X = rot180(X)
-       % X = flipdim(flipdim(X, 1), 2);
+        %X = flipdim(flipdim(X, 1), 2);
         X = rot90(X,2);
     end
 end
