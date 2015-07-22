@@ -11,7 +11,7 @@ function cnnnumgradcheck(net, x, y)
         d = (net_p.L - net_m.L) / (2 * epsilon);
         e = abs(d - net.dffb(j));
         if e > er
-            error('numerical gradient checking failed');
+            error('numerical gradient checking failed at ffb');
         end
     end
 
@@ -25,7 +25,7 @@ function cnnnumgradcheck(net, x, y)
             d = (net_p.L - net_m.L) / (2 * epsilon);
             e = abs(d - net.dffW(i, u));
             if e > er
-                error('numerical gradient checking failed');
+                error('numerical gradient checking failed at ffW');
             end
         end
     end
@@ -41,20 +41,23 @@ function cnnnumgradcheck(net, x, y)
                 d = (net_p.L - net_m.L) / (2 * epsilon);
                 e = abs(d - net.layers{l}.db{j});
                 if e > er
-                    error('numerical gradient checking failed');
+                    error(['numerical gradient checking failed at conv bias, layer ', num2str(l)...
+                                    ' error= ', num2str(e)]);
                 end
                 for i = 1 : numel(net.layers{l - 1}.a)
-                    for u = 1 : size(net.layers{l}.k{i}{j}, 1)
-                        for v = 1 : size(net.layers{l}.k{i}{j}, 2)
+                    for u = 1 : size(net.layers{l}.k{i,j}, 1)
+                        for v = 1 : size(net.layers{l}.k{i,j}, 2)
                             net_m = net; net_p = net;
-                            net_p.layers{l}.k{i}{j}(u, v) = net_p.layers{l}.k{i}{j}(u, v) + epsilon;
-                            net_m.layers{l}.k{i}{j}(u, v) = net_m.layers{l}.k{i}{j}(u, v) - epsilon;
+                            net_p.layers{l}.k{i,j}(u, v) = net_p.layers{l}.k{i,j}(u, v) + epsilon;
+                            net_m.layers{l}.k{i,j}(u, v) = net_m.layers{l}.k{i,j}(u, v) - epsilon;
                             net_m = cnnff(net_m, x); net_m = cnnbp(net_m, y);
                             net_p = cnnff(net_p, x); net_p = cnnbp(net_p, y);
                             d = (net_p.L - net_m.L) / (2 * epsilon);
-                            e = abs(d - net.layers{l}.dk{i}{j}(u, v));
+                            e = abs(d - net.layers{l}.dk{i,j}(u, v));
                             if e > er
-                                error('numerical gradient checking failed');
+                                error(['numerical gradient checking failed at conv dk, layer ', ... 
+                                    num2str(l), ...
+                                    ' error= ', num2str(e)]);
                             end
                         end
                     end

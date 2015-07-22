@@ -6,7 +6,7 @@ test_x = double(reshape(test_x',28,28,10000))/255;
 train_y = double(train_y');
 test_y = double(test_y');
 
-subset = round(0.2* size(train_x,3));
+subset = round(1* size(train_x,3));
 train_x = train_x(:,:,1:subset);
 train_y = train_y(:,1:subset);
 %% ex1 Train a 6c-2s-12c-2s Convolutional neural network 
@@ -25,8 +25,8 @@ cnn.layers = {
 
 
 opts.alpha = 1;
-opts.batchsize = 50;
-opts.numepochs = 1;
+opts.batchsize = 25;
+opts.numepochs = 3;
 
 cnn = cnnsetup(cnn, train_x, train_y);
 cnn = cnntrain(cnn, train_x, train_y, opts);
