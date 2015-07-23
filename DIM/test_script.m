@@ -39,7 +39,7 @@ w4=[ 0, 1, 0;
 w=1*w3;
 w=w+0.0*ones(3);
 
-
+ 
 X={img};
 w={w};
 convy=DIM_Conv(X,w,1);
@@ -56,8 +56,8 @@ convy=convy{1};
 dimy=DIM_Conv(X,w,2);
 dimy=dimy{1};
 diff=scaleMat2Gray(convy,12)-scaleMat2Gray(dimy,12);
-PlotAsImages({img,convy,dimy,diff},{'original','convolution','dim','conv-DIM'},false)
-PlotAsHistograms({img,convy,dimy,diff},{'original','convolution','dim','conv-DIM'},false)
+PlotAsImages({img,convy;dimy,diff},{'original','convolution';'dim','conv-DIM'},false)
+PlotAsHistograms({img,convy;dimy,diff},{'original','convolution';'dim','conv-DIM'},false)
 
 
 
