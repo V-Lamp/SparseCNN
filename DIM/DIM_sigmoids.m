@@ -158,6 +158,7 @@ for t=1:iterations
         %E{j}=tanh(X{j}(:,:,min(t,size(X{j},3))))./max(epsilon2,R{j});
         %E{inM}=X{inM}./max(epsilon2,R{inM,1});
         E{inM} = err_calc(X{inM},R{inM});
+
         if nargout>4
             Etrace{inM}(:,:,t)=E{inM};%record response over time
         end
@@ -177,16 +178,17 @@ for t=1:iterations
         %dY=(dY-1).*0.1 + 1;
         %dY=(sigm(dY)*2).^2;
         %modulate prediction neuron response by current input:
-        Y{outM}=max(epsilon1,Y{outM}).*dY;
+        %Y{outM}=max(epsilon1,Y{outM}).*dY;
+        Y{outM} = out_upd(max(epsilon1,Y{outM}),dY);
         %Y{outM}=ReLU(Y{outM});
         if nargout>3
             Ytrace{outM}(:,:,t)=Y{outM};%record response over time
         end
     end
-    a1_R=R{1};
-    a2_E1=E{1};
-    a3_Input=dY;
-    a4_Y1=Y{1};
+%     a1_R=R{1};
+%     a2_E1=E{1};
+%     a3_Input=dY;
+%     a4_Y1=Y{1};
 
     PlotAsImages({R{1,1},E{1,1};dY,Y{1}}, ...
         {'R','E';'dY','Y'})
@@ -203,11 +205,12 @@ disp(' ');
 end
 
 function E = err_calc(X,R)
-    %E = cust_sigm(X-R);
-    E = X-R;
+    in = (X-R)/1;
+    %E = cust_sigm(in);
+    E = in;
 end
 function Ynew = out_upd(Y, dY)
-    Ynew = Y.* cust_sigm(dY/10);
+    Ynew = Y.* cust_sigm(dY);
 end
 
 function s = cust_sigm(x)
