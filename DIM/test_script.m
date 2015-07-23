@@ -1,14 +1,14 @@
 clc;
 close all
-tSize=64;
-testImg=[ones(tSize,tSize/2),zeros(tSize,tSize/2)];
+tSize=16;
+testImg=[ones(tSize,tSize/2),ones(tSize,tSize/2)*0.999];
 testImg(tSize/2:tSize,tSize/2:tSize)=1;
-
+testImg = testImg';
 
 [lenna,map]=imread('lenna.jpg');
 lenna=mean(lenna,3);
 
-po=-0;
+po=0;
 img=10^po*mat2gray(lenna );
 
 wSize=4;
@@ -43,7 +43,7 @@ w=w+0.0*ones(3);
 X={img};
 w={w};
 convy=DIM_Conv(X,w,1);
-convy=ReLU(convy{1});
+convy=convy{1};
 
 % ws=SplitMatrix(w);
 % wp = ws{1};
@@ -58,3 +58,6 @@ dimy=dimy{1};
 diff=scaleMat2Gray(convy,12)-scaleMat2Gray(dimy,12);
 PlotAsImages({img,convy,dimy,diff},{'original','convolution','dim','conv-DIM'},false)
 PlotAsHistograms({img,convy,dimy,diff},{'original','convolution','dim','conv-DIM'},false)
+
+
+

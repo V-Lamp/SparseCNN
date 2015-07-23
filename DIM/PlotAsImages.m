@@ -17,7 +17,7 @@ cnt=1;
 for i=1:rLen
     for j=1:cLen
         if ~isempty(CellOfMats{i,j})
-            cnt = cLen*(i-1) + j
+            cnt = cLen*(i-1) + j;
             subplot(rLen,cLen,cnt)            
             subimage(scaleMat2Gray(CellOfMats{i,j}))
             if ~isempty(Titles)

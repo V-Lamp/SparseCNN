@@ -50,6 +50,16 @@ epsilon2=1e-3;
 
 disp('dim_activation_conv_recurrent');
 disp(['  epsilon1=',num2str(epsilon1),' epsilon2=',num2str(epsilon2)]);
+
+% flip weights to be equivalent to aggConv.
+% TODO: improve this
+for inM=1:nInMaps
+    for outM=1:nOutMaps
+        w{outM,inM}=rot90(w{outM,inM},2);
+    end
+end
+
+
 %% Arg defaults
 if nargin<3 || isempty(Y), %initialise prediction neuron outputs to zero
     for outM=1:nOutMaps
@@ -181,7 +191,8 @@ for t=1:iterations
                 dY=dY+ConvOrFFT(E{inM,1},w{outM,inM},'same',conv_fft);
             end            
         end
-        dY=(dY-1).*0.1 + 1;
+        %dY=(dY-1).*0.1 + 1;
+        dY=(sigm(dY)*2).^2;
         %modulate prediction neuron response by current input:
         Y{outM}=max(epsilon1,Y{outM}).*dY;
         %Y{outM}=ReLU(Y{outM});
@@ -200,10 +211,8 @@ for t=1:iterations
 %     PlotAsImagesAndHist({R{1,1},R{1,2};E{1,1},E{1,2};dY,Y{1}}, ...
 %         {'Rpos','Rneg';'Epos','Eneg';'dY','Y'})
     %pause(0.1)
-    while waitforbuttonpress ~= 1
-%         pause(1.5)
-%         drawnow
-    end
+    waitforbuttonpress
+
     
 end
 disp(' ');

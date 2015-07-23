@@ -13,18 +13,7 @@ function net = cnnff(net, x)
                 net.layers{l - 1}.a, ...
                 net.layers{l}.k.', ...
                 'valid',net.layers{l}.a);
-            for j = 1 : net.layers{l}.outputmaps   %  for each output map
-%                 %  create temp output map
-%                 z = zeros(...
-%                     size(net.layers{l - 1}.a{1}) - ...
-%                     [net.layers{l}.kernelsize - 1 net.layers{l}.kernelsize - 1 0]);
-%                 for i = 1 : inputmaps   %  for each input map
-%                     %  convolve with corresponding kernel and add to temp output map                    
-%                     z = z + convn(...
-%                         net.layers{l - 1}.a{i}, ...
-%                         net.layers{l}.k{i,j}, 'valid');
-%                 end
-                %  add bias, pass through nonlinearity
+            for j = 1 : net.layers{l}.outputmaps   %  for each output map%                 
                 net.layers{l}.a{j} = sigm( net.layers{l}.a{j} + net.layers{l}.b{j});
             end
             %  set number of input maps to this layers number of outputmaps
