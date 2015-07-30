@@ -205,12 +205,12 @@ disp(' ');
 end
 
 function E = err_calc(X,R)
-    in = (X-R)/1;
     %E = cust_sigm(in);
-    E = in;
+    E = logloss(X)./logloss(R);
+    %E = logloss(X-R);
 end
 function Ynew = out_upd(Y, dY)
-    Ynew = Y.* cust_sigm(dY);
+    Ynew = Y.* logloss(dY+1);
 end
 
 function s = cust_sigm(x)
@@ -223,7 +223,11 @@ function conv=ConvOrFFT(A,B,shape,conv_fft)
         conv=conv2(A,B,shape);
     end
 end
-
+function y= logloss(x)
+    %log1p(x)=log(1+x), more accurate
+    scale=1;
+    y = log1p(exp(x))/log1p(2);
+end
 
 
 

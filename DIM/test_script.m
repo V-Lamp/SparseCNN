@@ -9,7 +9,7 @@ testImg = testImg';
 lenna=mean(lenna,3);
 
 po=0;
-img=10^po*mat2gray(lenna );
+img=10^po*mat2gray(testImg );
 
 wSize=4;
 w0=[ones(wSize,wSize/2),3*ones(wSize,wSize/2)];
