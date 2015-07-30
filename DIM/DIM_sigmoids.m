@@ -206,11 +206,14 @@ end
 
 function E = err_calc(X,R)
     %E = cust_sigm(in);
-    E = logloss(X)./logloss(R);
+    minR = min(R(:));
+    E = X./(R - minR + 0.5);
     %E = logloss(X-R);
+    %E = X;
 end
 function Ynew = out_upd(Y, dY)
-    Ynew = Y.* logloss(dY+1);
+    mindY = min(dY(:));
+    Ynew = Y.* (dY-mindY + 0.5);
 end
 
 function s = cust_sigm(x)
