@@ -10,7 +10,7 @@ function net = cnnbp(net, y)
     net.od = net.e .* (net.o .* (1 - net.o));   %  output delta
     net.fvd = (net.ffW' * net.od);              %  feature vector delta
     if strcmp(net.layers{n}.type, 'c')         %  only conv layers has sigm function
-        net.fvd = net.fvd .* sigm_der(net.fv);
+        net.fvd = net.fvd .* sigm_der(net.fv);;
     end
 
     %  reshape feature vector deltas into output map style
@@ -27,10 +27,12 @@ function net = cnnbp(net, y)
             for j = 1 : numel(net.layers{l}.a)
                 expanded = expand(...
                      net.layers{l + 1}.d{j}, ...
-                     [net.layers{l + 1}.scale, net.layers{l + 1}.scale, 1]) ...
-                     ./ net.layers{l + 1}.scale ^ 2;
-                net.layers{l}.d{j} = ...
-                    sigm_der(net.layers{l}.a{j}) .* expanded;
+                     [net.layers{l + 1}.scale, net.layers{l + 1}.scale 1]);
+                expanded = expanded / net.layers{l + 1}.scale ^ 2;
+                sigm_x = net.layers{l}.a{j};
+                not_a_der = sigm_x .* (1 - sigm_x);
+                net.layers{l}.d{j} = not_a_der .* expanded;
+                
             end
         elseif strcmp(net.layers{l}.type, 's')
             
@@ -54,7 +56,7 @@ function net = cnnbp(net, y)
                 for j = 1 : numel(net.layers{l}.a)
                     net.layers{l}.dk{i,j} = ...
                         convn(...
-                            rotA, ...,
+                            rotA, ...
                             net.layers{l}.d{j}, 'valid') ...
                         / size(net.layers{l}.d{j}, 3);
                 end                
@@ -69,7 +71,7 @@ function net = cnnbp(net, y)
     net.dffb = mean(net.od, 2);
 
     function X = rot180(X)
-       % X = flipdim(flipdim(X, 1), 2);
+        %X = flipdim(flipdim(X, 1), 2);
         X = rot90(X,2);
     end
 end
