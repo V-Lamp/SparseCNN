@@ -1,7 +1,7 @@
 function net = cnnsetup(net, x, y)
     %assert(~isOctave() || compare_versions(OCTAVE_VERSION, '3.8.0', '>='), ['Octave 3.8.0 or greater is required for CNNs as there is a bug in convolution in previous versions. See http://savannah.gnu.org/bugs/?39314. Your version is ' myOctaveVersion]);
     inputmaps = 1;
-    mapsize = size(squeeze(x(:, :, 1)));
+    mapsize = size(x(:,:,1));
 
     for l = 1 : numel(net.layers)   %  layer
         % subsampling
@@ -41,7 +41,7 @@ function net = cnnsetup(net, x, y)
     % Note that the last layer is fully connected to the output layer,
     % that's why the size of the weights is (onum * fvnum)
     fvnum = prod(mapsize) * inputmaps;
-    onum = size(y, 1);
+    onum = numel(y(:,1));
 
     net.ffb = zeros(onum, 1);
     net.ffW = (rand(onum, fvnum) - 0.5) * 2 * sqrt(6 / (onum + fvnum));

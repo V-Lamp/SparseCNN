@@ -6,10 +6,10 @@ layers ={struct('type', 'i')};
 for i = 1: n_layers
     layers{1 + (i-1)*2 + 1} = ...
         struct('type', 'c', 'outputmaps', out_maps_counts(i), 'kernelsize', kernel_size);
-    layers{1 + (i-1)*2 + 1} = struct('type', 's', 'scale', 2);
+    layers{1 + (i-1)*2 + 2} = struct('type', 's', 'scale', 2);
 end
 net.layers= layers;
-net=cnnsetup(net, input_map_size,output_size);
+net=cnnsetup(net, input_map_size, output_size);
 
 end
 
