@@ -1,4 +1,4 @@
-function [Y,E,R,Ytrace,Etrace,Rtrace]=DIM_MaskSplitting...
+function [Y,E,R,Ytrace,Etrace,Rtrace]=DIM_sigmoids...
     (X,w,Y,iterations,v,downsample)
 %% Function description
 % w = a cell array of size {N,M}, where N is the number of distinct neuron types
@@ -77,8 +77,8 @@ if nargin<5 || isempty(v)
         
         maxVal=0;
         for inM=1:nInMaps
-            if ~isempty(w{outM,inM})                
-                maxVal=max(maxVal,max(max(abs(w{outM,inM}))));                
+            if ~isempty(w{outM,inM})
+                maxVal=max(maxVal,max(max(abs(w{outM,inM}))));
             end
         end
         
@@ -119,55 +119,45 @@ for inM=1:nInMaps
     end
 end
 
-%% For simplicity, do the splitting after all  scalling of w,v
-isInputSplitted=zeros(nInMaps);
-isMaskSplitted=zeros(nOutMaps,nInMaps);
-Xneg=cell(inM,1);
-for inM=1:nInMaps
-    for outM=1:nOutMaps
-        [w{outM,inM},isSp]=SplitMatrix(w{outM,inM});
-        isInputSplitted(inM) = isInputSplitted(inM) || isSp;
-        isMaskSplitted(outM,inM)=true;
-        
-        v{outM,inM}=SplitMatrix(v{outM,inM});
-    end
-    if isInputSplitted(inM)
-        Xneg{inM}=max(X{inM}(:))-X{inM};
-        Xneg{inM}=-X{inM};
-        Xneg{inM}=X{inM};
-    end
-end
+% %% For simplicity, do the splitting after all  scalling of w,v
+% isInputSplitted=zeros(nInMaps);
+% isMaskSplitted=zeros(nOutMaps,nInMaps);
+% Xneg=cell(inM,1);
+% for inM=1:nInMaps
+%     for outM=1:nOutMaps
+%         [w{outM,inM},isSp]=SplitMatrix(w{outM,inM});
+%         isInputSplitted(inM) = isInputSplitted(inM) || isSp;
+%         isMaskSplitted(outM,inM)=true;
+%
+%         v{outM,inM}=SplitMatrix(v{outM,inM});
+%     end
+%     if isInputSplitted(inM)
+%         Xneg{inM}=max(X{inM}(:))-X{inM};
+%         Xneg{inM}=-X{inM};
+%         Xneg{inM}=X{inM};
+%     end
+% end
 %% ////////////////////Main Loop/////////////////////////////////////
 
 %iterate DIM equations to determine neural responses
 fprintf(1,'dim_conv(%i): ',conv_fft);
-R=cell(nInMaps,2);
-E=cell(nInMaps,2);
+R=cell(nInMaps,1);
+E=cell(nInMaps,1);
 for t=1:iterations
     fprintf(1,'.%i.',t);
     %update error-detecting neuron responses
     for inM=1:nInMaps
         %calc predictive reconstruction of the input maps
-        R{inM,1}=single(0);%reset reconstruction of input
-        if isInputSplitted(inM)
-            R{inM,2}=single(0);%reset reconstruction of input
-        end
-        for outM=1:nOutMaps            
+        R{inM}=single(0);%reset reconstruction of input
+        for outM=1:nOutMaps
             %sum reconstruction over each output map
-            if isMaskSplitted(outM,inM)
-                R{inM,1}=R{inM,1}+ConvOrFFT(Y{outM},v{outM,inM}{1},'same',conv_fft);
-                R{inM,2}=R{inM,2}+ConvOrFFT(Y{outM},v{outM,inM}{2},'same',conv_fft);
-            else
-                R{inM,1}=R{inM,1}+ConvOrFFT(Y{outM},v{outM,inM},'same',conv_fft);
-            end
+            R{inM}=R{inM,1}+ConvOrFFT(Y{outM},v{outM,inM},'same',conv_fft);
         end
         %calc error between reconstruction and actual input: using values of input
         %that change over time (if these are provided)
         %E{j}=tanh(X{j}(:,:,min(t,size(X{j},3))))./max(epsilon2,R{j});
-        E{inM,1}=X{inM}./max(epsilon2,R{inM,1});
-        if isInputSplitted(inM)
-            E{inM,2}=Xneg{inM}./max(epsilon2,R{inM,2});  
-        end
+        %E{inM}=X{inM}./max(epsilon2,R{inM,1});
+        E{inM} = err_calc(X{inM},R{inM});
         
         if nargout>4
             Etrace{inM}(:,:,t)=E{inM};%record response over time
@@ -175,57 +165,74 @@ for t=1:iterations
         if nargout>5
             Rtrace{inM}(:,:,t)=R{inM};%record response over time
         end
-    end   
+    end
     %update prediction neuron responses
     for outM=1:nOutMaps
         dY=single(0);
         %sum inputs to prediction neurons from each input map
         for inM=1:nInMaps
             %input=input+max(0,conv2(E{j},w{i,j},'same')); %sensitive to phase
-            %input=input+abs(conv2(E{j},w{i,j},'same')); %invariant to phase            
-            if isMaskSplitted(outM,inM)
-                dY=dY+ConvOrFFT(E{inM,1},w{outM,inM}{1},'same',conv_fft);
-                dY=dY-ConvOrFFT(E{inM,2},w{outM,inM}{2},'same',conv_fft);
-                %dY=-dY;
-            else
-                dY=dY+ConvOrFFT(E{inM,1},w{outM,inM},'same',conv_fft);
-            end            
+            %input=input+abs(conv2(E{j},w{i,j},'same')); %invariant to phase
+            dY=dY+ConvOrFFT(E{inM},w{outM,inM},'same',conv_fft);
         end
         %dY=(dY-1).*0.1 + 1;
-        dY=(sigm(dY)*2).^2;
+        %dY=(sigm(dY)*2).^2;
         %modulate prediction neuron response by current input:
-        Y{outM}=max(epsilon1,Y{outM}).*dY;
+        %Y{outM}=max(epsilon1,Y{outM}).*dY;
+        Y{outM} = out_upd(max(epsilon1,Y{outM}),dY);
         %Y{outM}=ReLU(Y{outM});
         if nargout>3
             Ytrace{outM}(:,:,t)=Y{outM};%record response over time
         end
     end
-%     a1_R=R{1};
-%     a2_E1=E{1};
-%     a4_Y1=Y{1};
-%     a3_Input=input;
-    PlotAsImages({R{1,1},R{1,2};E{1,1},E{1,2};E{1,1}-E{1,2},dY;Y{1},[]}, ...
-        {'Rpos','Rneg';'Epos','Eneg';'E','dY';'Y',[]})
-    PlotAsHistograms({R{1,1},R{1,2};E{1,1},E{1,2};E{1,1}-E{1,2},dY;Y{1},[]}, ...
-        {'Rpos','Rneg';'Epos','Eneg';'E','dY';'Y',[]})
-%     PlotAsImagesAndHist({R{1,1},R{1,2};E{1,1},E{1,2};dY,Y{1}}, ...
-%         {'Rpos','Rneg';'Epos','Eneg';'dY','Y'})
-    %pause(0.1)
-    waitforbuttonpress
-
+    %     a1_R=R{1};
+    %     a2_E1=E{1};
+    %     a3_Input=dY;
+    %     a4_Y1=Y{1};
     
+%     PlotAsImages({R{1,1},E{1,1};dY,Y{1}}, ...
+%         {'R','E';'dY','Y'})
+%     PlotAsHistograms({R{1,1},E{1,1};dY,Y{1}}, ...
+%         {'R','E';'dY','Y'})
+    %     PlotAsImagesAndHist({R{1,1},R{1,2};E{1,1},E{1,2};dY,Y{1}}, ...
+    %         {'Rpos','Rneg';'Epos','Eneg';'dY','Y'})
+    %pause(0.1)
+    %waitforbuttonpress
 end
 disp(' ');
 end
-
 function conv=ConvOrFFT(A,B,shape,conv_fft)
-    if conv_fft==1
-        conv=convnfft(A,B,shape);
-    else
-        conv=conv2(A,B,shape);
-    end
+if conv_fft==1
+    conv=convnfft(A,B,shape);
+else
+    conv=conv2(A,B,shape);
+end
 end
 
+function E = err_calc(X,R)
+    %E = cust_sigm(in);
+    E = X./scaled(R,0.0001);
+    %E = logloss(X-R);
+    %E = X;
+end
+function Ynew = out_upd(Y, dY)
+    Ynew = Y.* scaled(dY,0.0001);
+end
+
+function y = scaled(x, minval)
+    y = x - min(x(:)); %first make positive
+    y  = y / max(mean(y(:)), 0.1) + minval;
+end
+
+function s = cust_sigm(x)
+    s= 1./(1+exp(-x))*2;
+end
+
+function y= logloss(x)
+    %log1p(x)=log(1+x), more accurate
+    scale=1;
+    y = log1p(exp(x))/log1p(2);
+end
 
 
 

@@ -8,7 +8,7 @@ testImg = testImg';
 [lenna,map]=imread('lenna.jpg');
 lenna=mean(lenna,3);
 
-po=0;
+po=1;
 img=10^po*mat2gray(lenna );
 
 wSize=4;
@@ -36,7 +36,7 @@ w4=[ 0, 1, 0;
     0, 0, 0;
     0,-1, 0];
 
-w=1*w2;
+w=1*w3;
 w=w+0.0*ones(3);
 
  

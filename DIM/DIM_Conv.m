@@ -11,7 +11,7 @@ end
 if method==1 % conv
     outMaps=aggConv(inMaps,w,'same',outMaps);
 elseif method==2 %DIM
-    outMaps=DIM_MaskSplitting(w,inMaps,outMaps,20);
+    outMaps=DIM_sigmoids(inMaps,w,outMaps,60);
 else
     error('method != 1|2') 
 end

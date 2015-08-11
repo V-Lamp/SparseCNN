@@ -1,12 +1,10 @@
-n_in=6;n_out=4;m=1;
-clc;
-rng(123)
-X=rand(n_in,m)*100
-w=rand(n_out,n_in)*100
-
-pinv(w)
-dY=ones(n_out,1)
-pinv(w)*dY
-w\dY
-mldivide(w,dY)
+function [] = test()
+    x= rand(10,1)-0.5;
+    y = scaled(x,0.5)
+    
+end
+function y = scaled(x, minval)
+    y = x - min(x(:)); %first make positive
+    y  = y / mean(y(:))+minval;
+end
 
