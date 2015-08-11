@@ -10,7 +10,7 @@ function net = cnnbp(net, y)
     net.od = net.e .* (net.o .* (1 - net.o));   %  output delta
     net.fvd = (net.ffW' * net.od);              %  feature vector delta
     if strcmp(net.layers{n}.type, 'c')         %  only conv layers has sigm function
-        net.fvd = net.fvd .* sigm_der(net.fv);;
+        net.fvd = net.fvd .* sigm_der(net.fv);
     end
 
     %  reshape feature vector deltas into output map style

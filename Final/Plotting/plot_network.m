@@ -1,11 +1,17 @@
-function [ output_args ] = plot_network(net)
+function plot_network(net, overwrite)
 %PLOT_NETWORK Summary of this function goes here
 %   Detailed explanation goes here
-    layers = {}
-    for i = 1:
-        layers{i} = net.layer{i}.a
+    if nargin < 2
+        overwrite = false;
     end
-    plot_layers(layers)
+    n_l = numel(net.layers);
+    layers = cell(n_l,1);
+    for i = 1: n_l
+        layers{i} = net.layers{i}.a;
+    end
+    layers{n_l+1}={net.o(:,1)'};
+    plot_layers(layers,overwrite)
 
 end
 
+ 

@@ -20,9 +20,11 @@ function net = cnntrain(net, x, y, opts)
             if isempty(net.rL)
                 net.rL(1) = net.L;
             end
-            net.rL(end + 1) = 0.99 * net.rL(end) + 0.01 * net.L;
+            net.rL(end + 1) = 0.99 * net.rL(end) + 0.01 * net.L;            
         end
         toc;
+        figure; plot(net.rL);
+        opts.alpha = opts.alpha*0.8;
     end
     
 end

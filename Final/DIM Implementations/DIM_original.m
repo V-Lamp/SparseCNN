@@ -1,5 +1,5 @@
 function [Y,E,R,Ytrace,Etrace,Rtrace]=dim_activation_conv_recurrent...
-            (w,X,Y,iterations,v,downsample)
+            (X,w,Y,iterations,v,downsample)
 % w = a cell array of size {N,M}, where N is the number of distinct neuron types
 %     and M is the number of input channels. Each element {i,j} of the cell
 %     array is a 2-dimensional matrix (a convolution mask) specifying the

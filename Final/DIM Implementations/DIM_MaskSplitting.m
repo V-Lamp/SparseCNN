@@ -48,8 +48,8 @@ nInputChannels=length(X);
 epsilon1=1e-5;
 epsilon2=1e-3;
 
-disp('dim_activation_conv_recurrent');
-disp(['  epsilon1=',num2str(epsilon1),' epsilon2=',num2str(epsilon2)]);
+% disp('dim_activation_conv_recurrent');
+% disp(['  epsilon1=',num2str(epsilon1),' epsilon2=',num2str(epsilon2)]);
 
 % flip weights to be equivalent to aggConv.
 % TODO: improve this
@@ -63,7 +63,7 @@ end
 %% Arg defaults
 if nargin<3 || isempty(Y), %initialise prediction neuron outputs to zero
     for outM=1:nOutMaps
-        Y{outM}=zeros(a,b,'single');
+        Y{outM}=zeros(a,b,z,'single');
     end
 end
 
@@ -140,14 +140,14 @@ end
 %% ////////////////////Main Loop/////////////////////////////////////
 
 %iterate DIM equations to determine neural responses
-fprintf(1,'dim_conv(%i): ',conv_fft);
+%fprintf(1,'dim_conv(%i): ',conv_fft);
 R=cell(nInMaps,2);
 E=cell(nInMaps,2);
 for t=1:iterations
-    fprintf(1,'.%i.',t);
+    %fprintf(1,'.%i.',t);
     %update error-detecting neuron responses
     for inM=1:nInMaps
-        %calc predictive reconstruction of the input maps
+        %calc predictive recons truction of the input maps
         R{inM,1}=single(0);%reset reconstruction of input
         if isInputSplitted(inM)
             R{inM,2}=single(0);%reset reconstruction of input
@@ -204,25 +204,25 @@ for t=1:iterations
 %     a2_E1=E{1};
 %     a4_Y1=Y{1};
 %     a3_Input=input;
-    PlotAsImages({R{1,1},R{1,2};E{1,1},E{1,2};E{1,1}-E{1,2},dY;Y{1},[]}, ...
-        {'Rpos','Rneg';'Epos','Eneg';'E','dY';'Y',[]})
-    PlotAsHistograms({R{1,1},R{1,2};E{1,1},E{1,2};E{1,1}-E{1,2},dY;Y{1},[]}, ...
-        {'Rpos','Rneg';'Epos','Eneg';'E','dY';'Y',[]})
+    %PlotAsImages({R{1,1},R{1,2};E{1,1},E{1,2};E{1,1}-E{1,2},dY;Y{1},[]}, ...
+    %    {'Rpos','Rneg';'Epos','Eneg';'E','dY';'Y',[]})
+    %PlotAsHistograms({R{1,1},R{1,2};E{1,1},E{1,2};E{1,1}-E{1,2},dY;Y{1},[]}, ...
+    %    {'Rpos','Rneg';'Epos','Eneg';'E','dY';'Y',[]})
 %     PlotAsImagesAndHist({R{1,1},R{1,2};E{1,1},E{1,2};dY,Y{1}}, ...
 %         {'Rpos','Rneg';'Epos','Eneg';'dY','Y'})
     %pause(0.1)
-    waitforbuttonpress
+    %waitforbuttonpress
 
     
 end
-disp(' ');
+%disp(' ');
 end
 
 function conv=ConvOrFFT(A,B,shape,conv_fft)
     if conv_fft==1
         conv=convnfft(A,B,shape);
     else
-        conv=conv2(A,B,shape);
+        conv=convn(A,B,shape);
     end
 end
 
