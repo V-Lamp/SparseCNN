@@ -1,3 +1,4 @@
+*.m     diff=matlab
 *.mdlp -crlf -diff -merge
 *.mat -crlf -diff -merge
 *.slxp -crlf -diff -merge
