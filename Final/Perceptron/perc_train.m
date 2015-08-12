@@ -35,6 +35,8 @@ function [ net ] = perc_train(net, train_x, train_y, opts)
         end
         disp(mean(net.rL))
         toc;
+        opts.alpha = opts.alpha * opts.red_rate;
     end
+    
 end
 

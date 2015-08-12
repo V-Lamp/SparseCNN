@@ -11,6 +11,6 @@ cnn = cnntrain(cnn, train_x, train_y, opts);
 figure; plot(cnn.rL);
 er_test = cnntest(cnn, test_x, test_y);
 er_train = cnntest(cnn, train_x, train_y);
-save('Results\large_cnn','cnn')
+save('saved_data\large_cnn','cnn')
 plot_network(cnn,false)
 assert(er_test<0.12, 'Too big error');

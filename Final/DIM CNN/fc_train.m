@@ -31,5 +31,6 @@ function [ net ] = fc_train( net, train_x, train_y, opts, ff_impl)
         end
         toc;
     end
+    opts.a = opts
 end
 
