@@ -1,7 +1,7 @@
-dim_impl = @DIM_MaskSplitting;
+dim_impl = @DIM_sigmoids;
 
 S = load('small_cnn');
-opts.alpha = 1;
+opts.alpha = 0.2;
 opts.batchsize = 50;
 opts.numepochs = 1;
 
@@ -11,8 +11,8 @@ ff = @(net, x) dim_ff(net, x, dim_impl);
 dim_cnn = fc_train(dim_cnn, train_x, train_y, opts, ff);
 
 figure; plot(dim_cnn.rL);
-er_test = dim_test(dim_cnn, test_x, test_y);
-er_train = dim_test(dim_cnn, train_x, train_y);
-save('results\small_dim_cnn','cnn')
+[er_test,bad] = dim_test(dim_cnn, test_x, test_y, dim_impl);
+er_train = dim_test(dim_cnn, train_x, train_y, dim_impl);
+save('results\small_dim_cnn','dim_cnn', 'er_test', 'er_train', 'bad')
 plot_network(dim_cnn)
 assert(er_test<0.12, 'Too big error');

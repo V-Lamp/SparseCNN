@@ -48,8 +48,8 @@ nInputChannels=length(X);
 epsilon1=1e-5;
 epsilon2=1e-3;
 
-disp('dim_activation_conv_recurrent');
-disp(['  epsilon1=',num2str(epsilon1),' epsilon2=',num2str(epsilon2)]);
+%disp('dim_activation_conv_recurrent');
+%disp(['  epsilon1=',num2str(epsilon1),' epsilon2=',num2str(epsilon2)]);
 
 % flip weights to be equivalent to aggConv.
 % TODO: improve this
@@ -140,11 +140,11 @@ end
 %% ////////////////////Main Loop/////////////////////////////////////
 
 %iterate DIM equations to determine neural responses
-fprintf(1,'dim_conv(%i): ',conv_fft);
+%fprintf(1,'dim_conv(%i): ',conv_fft);
 R=cell(nInMaps,1);
 E=cell(nInMaps,1);
 for t=1:iterations
-    fprintf(1,'.%i.',t);
+    %fprintf(1,'.%i.',t);
     %update error-detecting neuron responses
     for inM=1:nInMaps
         %calc predictive reconstruction of the input maps
@@ -199,7 +199,6 @@ for t=1:iterations
     %pause(0.1)
     %waitforbuttonpress
 end
-disp(' ');
 end
 function conv=ConvOrFFT(A,B,shape,conv_fft)
 if conv_fft==1
