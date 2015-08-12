@@ -63,7 +63,7 @@ end
 %% Arg defaults
 if nargin<3 || isempty(Y), %initialise prediction neuron outputs to zero
     for outM=1:nOutMaps
-        Y{outM}=zeros(a,b,'single');
+        Y{outM}=zeros(a,b,z,'single');
     end
 end
 
@@ -205,7 +205,7 @@ function conv=ConvOrFFT(A,B,shape,conv_fft)
 if conv_fft==1
     conv=convnfft(A,B,shape);
 else
-    conv=conv2(A,B,shape);
+    conv=convn(A,B,shape);
 end
 end
 
