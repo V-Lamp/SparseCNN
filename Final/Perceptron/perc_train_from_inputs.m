@@ -9,10 +9,10 @@ outmaps_count = numel(train_in);
 
 net = perc_setup(outmaps_size, outmaps_count, 10);
 
-opts.alpha = 2;
-opts.red_rate = 0.7;
-opts.batchsize = 10;
-opts.numepochs = 20;
+opts.alpha = 0.1;
+opts.red_rate = 0.8;
+opts.batchsize = 25;
+opts.numepochs = 40;
 
 res.net = perc_train(net, train_in, train_y, opts);
 res.er_train = perc_test(res.net,train_in,  train_y);

@@ -191,8 +191,8 @@ for t=1:iterations
                 dY=dY+ConvOrFFT(E{inM,1},w{outM,inM},'same',conv_fft);
             end            
         end
-        %dY=(dY-1).*0.1 + 1;
-        dY=(sigm(dY)*2).^2;
+        dY=(dY-1).*0.1 + 1;
+        
         %modulate prediction neuron response by current input:
         Y{outM}=max(epsilon1,Y{outM}).*dY;
         %Y{outM}=ReLU(Y{outM});

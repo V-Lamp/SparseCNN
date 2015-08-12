@@ -211,7 +211,7 @@ end
 function E = err_calc(X,R)
     %E = cust_sigm(in);
     E = X./scaled(R,0.0001);
-    %E = logloss(X-R);
+    E = logloss(X-R);
     %E = X;
 end
 function Ynew = out_upd(Y, dY)
@@ -220,7 +220,7 @@ end
 
 function y = scaled(x, minval)
     y = x - min(x(:)); %first make positive
-    y  = y / max(mean(y(:)), 0.1) + minval;
+    y  = y / max(mean(y(:)), 0.01) + minval;
 end
 
 function s = cust_sigm(x)

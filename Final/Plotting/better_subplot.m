@@ -3,11 +3,13 @@ function [ h ] = better_subplot(n,m,i,scale )
 %   Detailed explanation goes here
     
     h = subplot(n,m,i);
-
+    margin = 0.02;
     p = get(h, 'pos');
     scale= scale-1;
+%     p(1)=(p(1)-margin)/(1-2*margin);
+%     p(2)=(p(2)-margin)/(1-2*margin);
     p(1) = p(1)-p(3)*scale/2;
-    p(2)= p(2)- p(4)*scale/2;
+    p(2)= p(2)- p(4)*scale/2;    
     p(3) = p(3)*(1+scale);
     p(4) = p(4)*(1+scale);
     set(h, 'pos', p);
