@@ -63,10 +63,27 @@ end
 %% Arg defaults
 if nargin<3 || isempty(Y), %initialise prediction neuron outputs to zero
     for outM=1:nOutMaps
-        Y{outM}=zeros(a,b,z,'single');
+        Y{outM}=zeros(a-c+1,b-d+1,'single');
     end
 end
-
+out_map_size = size(Y{1}(:,:,1));
+avoidEdgeEffects=1;
+if avoidEdgeEffects
+  %pad image (and all other image-sized arrays) to avoid edge effects
+  for j=1:nInMaps
+    X{j} = pad_with_fade(X{j},[c,d]);
+%     X{j}=padarray(X{j},[c,d],'replicate');%'symmetric');
+%     fade=[1:c]./c;
+%     X{j}(1:c,:)=X{j}(1:c,:).*repmat(fade',1,b+2*d);
+%     X{j}(a+c+[1:c],:)=X{j}(a+c+[1:c],:).*repmat(flipud(fade'),1,b+2*d);
+%     fade=[1:d]./d;
+%     X{j}(:,1:d)=X{j}(:,1:d).*repmat(fade,a+2*c,1);
+%     X{j}(:,b+d+[1:d])=X{j}(:,b+d+[1:d]).*repmat(fliplr(fade),a+2*c,1); 
+  end
+  for i=1:nOutMaps
+    Y{i}=padarray(Y{i},[c,d],'replicate');%'symmetric');
+  end
+end
 if nargin<4 || isempty(iterations), iterations=50; end
 
 if nargin<5 || isempty(v)
@@ -151,7 +168,7 @@ for t=1:iterations
         R{inM}=single(0);%reset reconstruction of input
         for outM=1:nOutMaps
             %sum reconstruction over each output map
-            R{inM}=R{inM,1}+ConvOrFFT(Y{outM},v{outM,inM},'same',conv_fft);
+            R{inM}=R{inM,1}+conv2(Y{outM},v{outM,inM},'full');
         end
         %calc error between reconstruction and actual input: using values of input
         %that change over time (if these are provided)
@@ -173,7 +190,7 @@ for t=1:iterations
         for inM=1:nInMaps
             %input=input+max(0,conv2(E{j},w{i,j},'same')); %sensitive to phase
             %input=input+abs(conv2(E{j},w{i,j},'same')); %invariant to phase
-            dY=dY+ConvOrFFT(E{inM},w{outM,inM},'same',conv_fft);
+            dY=dY+conv2(E{inM},w{outM,inM},'valid');
         end
         %dY=(dY-1).*0.1 + 1;
         %dY=(sigm(dY)*2).^2;
@@ -199,6 +216,20 @@ for t=1:iterations
     %pause(0.1)
     %waitforbuttonpress
 end
+if avoidEdgeEffects
+  %return results that are the same size as original (unpadded) image
+  for j=1:nInMaps
+    if ~iszero(R{j}) %skip empty channels
+      temp = unpad(R{j},[a,b],[c,d]);
+      R{j}=R{j}(c+[1:a],d+[1:b]);
+
+      E{j}=E{j}(c+[1:a],d+[1:b]);
+    end
+  end
+  for i=1:nOutMaps
+    Y{i}=unpad(Y{i},out_map_size,[c,d]);
+  end
+end
 end
 function conv=ConvOrFFT(A,B,shape,conv_fft)
 if conv_fft==1
@@ -209,18 +240,20 @@ end
 end
 
 function E = err_calc(X,R)
-    %E = cust_sigm(in);
-    E = X./scaled(R,0.0001);
-    E = logloss(X-R);
+    E = cust_sigm(X-R);%./cust_sigm(R);
+    %E = X./scaled(R,     0.0000001);
+    %E = logloss(X)./logloss(R);
     %E = X;
 end
 function Ynew = out_upd(Y, dY)
-    Ynew = Y.* scaled(dY,0.0001);
+    Ynew = cust_sigm(Y+dY);%.* cust_sigm(dY);
+    %Ynew = Y.* scaled(dY,0.0000001);
+    %Ynew = logloss(Y).*logloss(dY);
 end
 
 function y = scaled(x, minval)
     y = x - min(x(:)); %first make positive
-    y  = y / max(mean(y(:)), 0.01) + minval;
+    y  = y / max(mean(y(:)), 1) + minval;
 end
 
 function s = cust_sigm(x)

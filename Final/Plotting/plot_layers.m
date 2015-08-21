@@ -36,7 +36,7 @@ for j = 1:n_layers
         cnt = n_out*(j-1)+i;
         h = better_subplot(n_layers, n_out, cnt,0.9);  
         to_plot = layer{i}(:,:,1);
-        hist(to_plot(:),256/2)         
+        hist(to_plot(:),256/4)         
     end
     
 end

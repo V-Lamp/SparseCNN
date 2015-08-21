@@ -47,8 +47,8 @@ function net = cnnff(net, x)
     %  concatenate all end layer feature maps into vector
     net.fv = [];
     for j = 1 : numel(net.layers{n}.a)
-        sa = size(net.layers{n}.a{j});
-        net.fv = [net.fv; reshape(net.layers{n}.a{j}, sa(1) * sa(2), sa(3))];
+        [a,b,z] = size(net.layers{n}.a{j});
+        net.fv = [net.fv; reshape(net.layers{n}.a{j}, a * b, z)];
     end
     %  feedforward into output perceptrons
     net.o = sigm(net.ffW * net.fv + repmat(net.ffb, 1, size(net.fv, 2)));

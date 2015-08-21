@@ -1,4 +1,4 @@
-C = load('saved_data\cnn_outmaps');
+C = load(['saved_data',filesep,'cnn_outmaps']);
 outmaps = C.outmaps;
 Y = C.Y;
 [train_x, train_y, test_x, test_y] = get_mnist_data();

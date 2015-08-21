@@ -1,4 +1,5 @@
 Final/saved_data/
+*.mat
 *.pdf
 *-ubyte
 #ignore thumbnails created by windows
@@ -31,3 +32,4 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 *.dat
 *.asv
+backup/

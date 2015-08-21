@@ -2,8 +2,8 @@ S = load('small_cnn');
 [train_x, train_y, test_x, test_y] = get_mnist_data();
 sample = test_x(:,:,1:4);
 
-dim_impls = {@DIM_MaskSplitting, @DIM_sigmoids};
-masks = S.cnn.layers{2}.k.';
+dim_impls = {@DIM_MaskSplitting, @DIM_sigmoids, @DIM_sep_mask_splitting};
+masks = S.cnn.layers{2}.k';
 
 for i =1:numel(dim_impls)
     out_batch{i} = dim_impls{i}({sample},masks,{},30);
@@ -17,7 +17,9 @@ for i =1:numel(dim_impls)
 end
 for i =1:numel(dim_impls)
     for j =1:size(masks,1)
-        diff =  out_batch{i}{j} - out_ser{i}{j};
+        batch = out_batch{i}{j};
+        ser = out_ser{i}{j};
+        diff =  batch - ser;
         disp(['i =: ', num2str(i)])
         disp(['sum of diff: ', num2str( sum(diff(:)))])
     end

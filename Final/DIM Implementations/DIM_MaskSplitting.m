@@ -45,8 +45,8 @@ nInputChannels=length(X);
 [c,d]=size(w{1,1});
 
 %set parameters
-epsilon1=1e-5;
-epsilon2=1e-3;
+epsilon1=1e-4;
+epsilon2=1e-4;
 
 % disp('dim_activation_conv_recurrent');
 % disp(['  epsilon1=',num2str(epsilon1),' epsilon2=',num2str(epsilon2)]);
@@ -63,10 +63,27 @@ end
 %% Arg defaults
 if nargin<3 || isempty(Y), %initialise prediction neuron outputs to zero
     for outM=1:nOutMaps
-        Y{outM}=zeros(a,b,z,'single');
+        Y{outM}=zeros(a-c+1,b-d+1,'single');
     end
 end
-
+out_map_size = size(Y{1}(:,:,1));
+avoidEdgeEffects=1;
+if avoidEdgeEffects
+  %pad image (and all other image-sized arrays) to avoid edge effects
+  for j=1:nInMaps
+    X{j} = pad_with_fade(X{j},[c,d]);
+%     X{j}=padarray(X{j},[c,d],'replicate');%'symmetric');
+%     fade=[1:c]./c;
+%     X{j}(1:c,:)=X{j}(1:c,:).*repmat(fade',1,b+2*d);
+%     X{j}(a+c+[1:c],:)=X{j}(a+c+[1:c],:).*repmat(flipud(fade'),1,b+2*d);
+%     fade=[1:d]./d;
+%     X{j}(:,1:d)=X{j}(:,1:d).*repmat(fade,a+2*c,1);
+%     X{j}(:,b+d+[1:d])=X{j}(:,b+d+[1:d]).*repmat(fliplr(fade),a+2*c,1); 
+  end
+  for i=1:nOutMaps
+    Y{i}=padarray(Y{i},[c,d],'replicate');%'symmetric');
+  end
+end
 if nargin<4 || isempty(iterations), iterations=50; end
 
 if nargin<5 || isempty(v)
@@ -155,10 +172,10 @@ for t=1:iterations
         for outM=1:nOutMaps            
             %sum reconstruction over each output map
             if isMaskSplitted(outM,inM)
-                R{inM,1}=R{inM,1}+ConvOrFFT(Y{outM},v{outM,inM}{1},'same',conv_fft);
-                R{inM,2}=R{inM,2}+ConvOrFFT(Y{outM},v{outM,inM}{2},'same',conv_fft);
+                R{inM,1}=R{inM,1}+conv2(Y{outM},v{outM,inM}{1},'full');
+                R{inM,2}=R{inM,2}+conv2(Y{outM},v{outM,inM}{2},'full');
             else
-                R{inM,1}=R{inM,1}+ConvOrFFT(Y{outM},v{outM,inM},'same',conv_fft);
+                R{inM,1}=R{inM,1}+conv2(Y{outM},v{outM,inM},'full');
             end
         end
         %calc error between reconstruction and actual input: using values of input
@@ -184,14 +201,14 @@ for t=1:iterations
             %input=input+max(0,conv2(E{j},w{i,j},'same')); %sensitive to phase
             %input=input+abs(conv2(E{j},w{i,j},'same')); %invariant to phase            
             if isMaskSplitted(outM,inM)
-                dY=dY+ConvOrFFT(E{inM,1},w{outM,inM}{1},'same',conv_fft);
-                dY=dY-ConvOrFFT(E{inM,2},w{outM,inM}{2},'same',conv_fft);
+                dY=dY+conv2(E{inM,1},w{outM,inM}{1},'valid');
+                dY=dY-conv2(E{inM,2},w{outM,inM}{2},'valid');
                 %dY=-dY;
             else
-                dY=dY+ConvOrFFT(E{inM,1},w{outM,inM},'same',conv_fft);
+                dY=dY+conv2(E{inM,1},w{outM,inM},'valid');
             end            
         end
-        dY=(dY-1).*0.1 + 1;
+        %dY=(dY-1).*0.5 + 1;
         
         %modulate prediction neuron response by current input:
         Y{outM}=max(epsilon1,Y{outM}).*dY;
@@ -211,19 +228,32 @@ for t=1:iterations
 %     PlotAsImagesAndHist({R{1,1},R{1,2};E{1,1},E{1,2};dY,Y{1}}, ...
 %         {'Rpos','Rneg';'Epos','Eneg';'dY','Y'})
     %pause(0.1)
-    %waitforbuttonpress
+    %waitforbuttonpress    
+end
 
-    
+if avoidEdgeEffects
+%   %return results that are the same size as original (unpadded) image
+%   for j=1:nInMaps
+%     if ~iszero(R{j}) %skip empty channels
+%       temp = unpad(R{j},[a,b],[c,d]);
+%       R{j}=R{j}(c+[1:a],d+[1:b]);
+% 
+%       E{j}=E{j}(c+[1:a],d+[1:b]);
+%     end
+%   end
+  for i=1:nOutMaps
+    Y{i}=unpad(Y{i},out_map_size,[c,d]);
+  end
 end
 %disp(' ');
 end
 
 function conv=ConvOrFFT(A,B,shape,conv_fft)
-    if conv_fft==1
-        conv=convnfft(A,B,shape);
-    else
-        conv=convn(A,B,shape);
-    end
+%     if conv_fft==1
+%         conv=convnfft(A,B,shape);
+%     else
+        conv=conv2(A,B,shape);
+%     end
 end
 
 
