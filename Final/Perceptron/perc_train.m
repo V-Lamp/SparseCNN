@@ -9,9 +9,10 @@ function [ net ] = perc_train(net, train_x, train_y, opts)
         disp(numbatches)
         error('numbatches not integer');        
     end
-    
-    for i = 1 : opts.numepochs
-        net.rL = [];
+    net.rL = [];
+    figure;
+    for i = 1 : opts.numepochs        
+        net.L_epoch=[];
         disp(['epoch ' num2str(i) '/' num2str(opts.numepochs)]);
         tic;
         kk = randperm(m);
@@ -26,15 +27,21 @@ function [ net ] = perc_train(net, train_x, train_y, opts)
             net = perc_ff(net, batch_x);
             net = perc_bp(net, batch_y);
             net = perc_apply_grads(net, opts);
-            if isempty(net.rL)
-                net.rL(1) = net.L;
-            end
-            net.rL(end + 1) = 0.99 * net.rL(end) + 0.01 * net.L;
+%             if isempty(net.rL)
+%                 net.rL(1) = net.L;
+%             end
+%             net.rL(end + 1) = 0.99 * net.rL(end) + 0.01 * net.L;
             %disp(['Epoch: ',num2str(i),' batch: ', num2str(batch), '/',num2str(numbatches)])
-            
+            net.L_epoch = [net.L_epoch, net.L];
         end
-        disp(mean(net.rL))
         toc;
+        
+        net.rL(i) = mean(net.L_epoch);
+        
+        disp([net.rL(i), net.rL(i)-net.rL(max(1,i-1))]);
+        semilogy(net.rL);
+        drawnow
+        
         opts.alpha = opts.alpha * opts.red_rate;
     end
     

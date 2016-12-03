@@ -4,22 +4,24 @@ function save_outputs(func, filename )
     [train_x, ~, test_x, ~] = get_mnist_data();
     train_out = get_output(func, train_x);
     test_out = get_output(func, test_x);
-    
-    save (['saved_data',filesep,filename], 'train_out', 'test_out');
-
+    disp('saving...')
+    save (['saved_data',filesep,filename], 'train_out', 'test_out', '-v7.3');
+    disp([filename, ' saved.'])
 end
 function out = get_output(func, input)
     z = size(input,3);
     
     out_dummy = func(input(:,:,1));
     
+    to_save = [3,5];
+    
     n_l  =numel(out_dummy);
     out = cell(n_l,1);
     
-    for j =1:n_l
+    for j = to_save
         n_maps = numel(out_dummy{j});
         map_size = size(out_dummy{j}{1});
-        out{j} = cell(numel(out_dummy{j}));
+        out{j} = cell(numel(out_dummy{j},1));
         for k = 1:n_maps
             out{j}{k} = zeros([map_size, z]);
         end
@@ -28,7 +30,7 @@ function out = get_output(func, input)
     tic
     for i = 1:z        
         out_single = func(input(:,:,i));        
-        for j =1:n_l
+        for j = to_save
             n_maps = numel(out_single{j});
             for k = 1:n_maps
                 out{j}{k}(:,:,i) = out_single{j}{k};

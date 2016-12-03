@@ -45,8 +45,8 @@ nInputChannels=length(X);
 [c,d]=size(w{1,1});
 
 %set parameters
-epsilon1=1e-4;
-epsilon2=1e-4;
+epsilon1=1e-3;
+epsilon2=1e-2;
 
 % disp('dim_activation_conv_recurrent');
 % disp(['  epsilon1=',num2str(epsilon1),' epsilon2=',num2str(epsilon2)]);

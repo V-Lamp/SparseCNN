@@ -1,6 +1,10 @@
+%% Naive
+[train_x, train_y, test_x, test_y] = get_mnist_data();
 
+res_naive = perc_train_from_inputs({train_x},train_y, {test_x},test_y)
 
 %% CNN
+disp(;
 [~, train_y, ~, test_y] = get_mnist_data();
 S = load(['saved_data',filesep,'out_cnn']);
 

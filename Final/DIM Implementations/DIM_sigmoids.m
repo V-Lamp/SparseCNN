@@ -46,7 +46,7 @@ nInputChannels=length(X);
 
 %set parameters
 epsilon1=1e-5;
-epsilon2=1e-3;
+epsilon2=1e-5;
 
 %disp('dim_activation_conv_recurrent');
 %disp(['  epsilon1=',num2str(epsilon1),' epsilon2=',num2str(epsilon2)]);
@@ -241,14 +241,15 @@ end
 
 function E = err_calc(X,R)
     E = cust_sigm(X-R);%./cust_sigm(R);
-    %E = X./scaled(R,     0.0000001);
-    %E = logloss(X)./logloss(R);
+%     E = X./scaled(R,     0.0000001);
+%     E = X./logloss(R);
     %E = X;
 end
 function Ynew = out_upd(Y, dY)
+    dY=(dY-1).*0.1 + 1;
     Ynew = cust_sigm(Y+dY);%.* cust_sigm(dY);
-    %Ynew = Y.* scaled(dY,0.0000001);
-    %Ynew = logloss(Y).*logloss(dY);
+    Ynew = Y.* scaled(dY,0.0000001);
+    Ynew = Y.*logloss(dY);
 end
 
 function y = scaled(x, minval)

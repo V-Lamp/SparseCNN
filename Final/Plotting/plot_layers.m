@@ -6,6 +6,9 @@ if overwrite
 else
     h_im = figure();
 end
+
+set(h_im,'Color',[0.8 0.9 1]);
+%set(gca,'Color',[0.8 0.8 1]);
 set(h_im,'units','normalized','outerposition',[0 0 0.5 1])
 
 n_layers = numel(layers_outputs);

@@ -1,17 +1,22 @@
+%% Naive
+[train_x, train_y, test_x, test_y] = get_mnist_data();
 
+res_naive = perc_train_from_inputs({train_x},train_y, {test_x},test_y)
 
 %% CNN
 [~, train_y, ~, test_y] = get_mnist_data();
 S = load(['saved_data',filesep,'out_cnn']);
-
-res_cnn = perc_train_from_inputs(S.train_out,train_y, S.test_out,test_y)
+%%
+layer = 5;
+res_cnn = perc_train_from_inputs(S.train_out{layer},train_y, S.test_out{layer},test_y)
 
 %% DIM sep mask splitting
 [~, train_y, ~, test_y] = get_mnist_data();
 S = load(['saved_data',filesep,'out_dim_sep_mask_split']);
 % S.train_out= transform_saved(S.train_out);
 % S.test_out= transform_saved(S.test_out);
-res_sep_mask_split = perc_train_from_inputs(S.train_out,train_y, S.test_out,test_y)
+layer = 3;
+res_sep_mask_split = perc_train_from_inputs(S.train_out{layer},train_y, S.test_out{layer},test_y)
 
 %% DIM mask splitting
 [~, train_y, ~, test_y] = get_mnist_data();

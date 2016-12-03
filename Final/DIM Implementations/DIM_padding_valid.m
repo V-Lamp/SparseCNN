@@ -44,7 +44,7 @@ nInputChannels=length(X);
 % end
 
 %set parameters
-epsilon1=1e-5;
+epsilon1=1e-3;
 epsilon2=1e-3;
 
 if nargin<4 || isempty(iterations), iterations=50; end

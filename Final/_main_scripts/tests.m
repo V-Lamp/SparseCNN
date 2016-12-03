@@ -24,3 +24,13 @@ for i =1:numel(dim_impls)
         disp(['sum of diff: ', num2str( sum(diff(:)))])
     end
 end
+%%
+[train_x, train_y, test_x, test_y] = get_mnist_data();
+for i = 1:60000
+    for j = 1:10000
+        train = train_x(:,:,i);
+        test=test_x(:,:,j);
+        res(i,j) = all(train(:) == test(:));
+    end
+end
+sum(res(:))
